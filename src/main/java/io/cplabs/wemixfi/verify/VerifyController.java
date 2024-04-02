@@ -1,5 +1,11 @@
 package io.cplabs.wemixfi.verify;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,9 +13,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
+
 @RestController
 @RequestMapping("/")
 public class VerifyController {
+
+    public static File createTempFile(String content) throws IOException {
+        // Get the system's temporary directory
+        String tempDir = System.getProperty("java.io.tmpdir");
+
+        // Create a unique filename using System.currentTimeMillis()
+        String fileName = "temp_file_" + System.currentTimeMillis() + ".txt";
+
+        // Create a temporary file
+        File tempFile = new File(tempDir, fileName);
+        tempFile.createNewFile();
+
+        // Write the string content to the temporary file
+        Files.write(tempFile.toPath(), content.getBytes());
+
+        return tempFile;
+    }
+
     @PostMapping("/api")
     public ResponseEntity<VerifyResponse> verify(
             @RequestParam String apikey,
@@ -30,6 +56,26 @@ public class VerifyController {
         System.out.println("contractname =" + contractname);
         System.out.println("compilerversion =" + compilerversion);
         System.out.println("constructorArguements =" + constructorArguements);
+
+        try {
+            File tempFile = createTempFile(sourceCode);
+            ProcessBuilder processBuilder = new ProcessBuilder(compilerversion, "--standard-json", tempFile.getAbsolutePath());
+            System.out.println("Step 1");
+            Process process = processBuilder.start();
+            System.out.println("Step 2");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            System.out.println("Step 3");
+            String line;
+            Gson gson = new Gson();
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+                SolidityStandardOutput object = gson.fromJson(line, SolidityStandardOutput.class);
+                System.out.println("=============================================================================");
+                System.out.println(object);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         boolean isValid = true;
         // Response
