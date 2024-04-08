@@ -11,7 +11,7 @@ public class SolidityStandardOutput {
   private Map<String, SourceFile> sources;
 
   // Mandatory: contracts field
-  private Map<String, Contract> contracts;
+  private Map<String, Map<String, Contract>> contracts;
 
   // Getters and Setters for each field
   public List<Error> getErrors() {
@@ -23,18 +23,18 @@ public class SolidityStandardOutput {
   }
 
   public Map<String, SourceFile> getSources() {
-    return sources;
+    return this.sources;
   }
   
   public void setSources(Map<String, SourceFile> sources) {
     this.sources = sources;
   }
   
-  public Map<String, Contract> getContracts() {
-    return contracts;
+  public Map<String, Map<String, Contract>> getContracts() {
+    return this.contracts;
   }
   
-  public void setContracts(Map<String, Contract> contracts) {
+  public void setContracts(Map<String, Map<String, Contract>> contracts) {
     this.contracts = contracts;
   }
 } 

@@ -63,4 +63,15 @@ public class Evm {
     }
   
     // Optional: Ewasm field (not shown here)
+    @Override
+    public String toString() {
+        return "EVM{" +
+            "assembly='" + assembly +
+            ", legacyAssembly=" + legacyAssembly +
+            ", bytecode=" + bytecode +
+            ", deployedBytecode=" + deployedBytecode +
+            ", methodIdentifiers=" + methodIdentifiers +
+            ", gasEstimates=" + gasEstimates +
+        "}";
+    }
 }

@@ -1,23 +1,26 @@
 package io.cplabs.wemixfi.verify;
 
+import java.util.List;
+
 public class Contract {
 
     // Use String as a placeholder for complex types like ABI
-    private String abi;
+    private List<Abi> abis;
     private String metadata;
     private Object userdoc; // Can be a HashMap representing user documentation
     private Object devdoc; // Can be a HashMap representing developer documentation
     private String ir;
     private StorageLayout storageLayout;
     private Evm evm;
+    private Ewasm ewasm;
 
     // Getters and Setters for each field
-    public String getAbi() {
-        return this.abi;
+    public List<Abi> getAbis() {
+        return this.abis;
     }
 
-    public void setAbi(String abi) {
-        this.abi = abi;
+    public void setAbis(List<Abi> abis) {
+        this.abis = abis;
     }
 
     public String getMetadata() {
@@ -66,5 +69,27 @@ public class Contract {
 
     public void setEvm(Evm evm) {
         this.evm = evm;
+    }
+
+    public Ewasm getEwasm() {
+        return ewasm;
+    }
+    
+    public void setEwasm(Ewasm ewasm) {
+        this.ewasm = ewasm;
+    }
+
+    @Override
+    public String toString() {
+        return "Contract{" +
+            "abi='" + abis + '\'' +
+            ", metadata='" + metadata + '\'' +
+            ", userdoc=" + userdoc +
+            ", devdoc=" + devdoc +
+            ", ir='" + ir + '\'' +
+            ", storageLayout=" + storageLayout +
+            ", evm=" + evm +
+            ", ewasm=" + ewasm +
+            '}';
     }
 }
