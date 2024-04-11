@@ -38,7 +38,7 @@ public class SourceCodeResult {
     public void setSourceCode(String sourceCode) {
         this.SourceCode = sourceCode;
     }
-    
+
     public String getABI() {
         return ABI;
     }
@@ -46,7 +46,7 @@ public class SourceCodeResult {
     public void setABI(String abi) {
         this.ABI = abi;
     }
-    
+
     public String getContractName() {
         return ContractName;
     }
@@ -54,7 +54,7 @@ public class SourceCodeResult {
     public void setContractName(String contractName) {
         this.ContractName = contractName;
     }
-    
+
     public String getCompilerVersion() {
         return CompilerVersion;
     }
@@ -62,7 +62,7 @@ public class SourceCodeResult {
     public void setCompilerVersion(String compilerVersion) {
         this.CompilerVersion = compilerVersion;
     }
-    
+
     public String getOptimizationUsed() {
         return OptimizationUsed;
     }
@@ -70,7 +70,7 @@ public class SourceCodeResult {
     public void setOptimizationUsed(String optimizationUsed) {
         this.OptimizationUsed = optimizationUsed;
     }
-    
+
     public String getRuns() {
         return Runs;
     }
@@ -78,7 +78,7 @@ public class SourceCodeResult {
     public void setRuns(String runs) {
         this.Runs = runs;
     }
-    
+
     public String getConstructorArguments() {
         return ConstructorArguments;
     }
@@ -86,7 +86,7 @@ public class SourceCodeResult {
     public void setConstructorArguments(String constructorArguments) {
         this.ConstructorArguments = constructorArguments;
     }
-    
+
     public String getEVMVersion() {
         return EVMVersion;
     }
@@ -94,7 +94,7 @@ public class SourceCodeResult {
     public void setEVMVersion(String evmVersion) {
         this.EVMVersion = evmVersion;
     }
-    
+
     public String getLibrary() {
         return Library;
     }
@@ -102,7 +102,7 @@ public class SourceCodeResult {
     public void setLibrary(String library) {
         this.Library = library;
     }
-    
+
     public String getLicenseType() {
         return LicenseType;
     }
@@ -110,7 +110,7 @@ public class SourceCodeResult {
     public void setLicenseType(String licenseType) {
         this.LicenseType = licenseType;
     }
-    
+
     public String getProxy() {
         return Proxy;
     }
@@ -118,7 +118,7 @@ public class SourceCodeResult {
     public void setProxy(String proxy) {
         this.Proxy = proxy;
     }
-    
+
     public String getImplementation() {
         return Implementation;
     }
@@ -126,7 +126,7 @@ public class SourceCodeResult {
     public void setImplementation(String implementation) {
         this.Implementation = implementation;
     }
-    
+
     public String getSwarmSource() {
         return SwarmSource;
     }

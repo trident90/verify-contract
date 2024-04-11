@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.print.DocFlavor.READER;
 
@@ -62,58 +63,63 @@ public class VerifyController {
         System.out.println("module =" + module);
         System.out.println("action =" + action);
         System.out.println("contractaddress =" + contractaddress);
-        System.out.println("sourceCode =" + sourceCode);
+        System.out.println("sourceCode =" + sourceCode.substring(0, 64) + "...");
         System.out.println("codeformat =" + codeformat);
         System.out.println("contractname =" + contractname);
         System.out.println("compilerversion =" + compilerversion);
         System.out.println("constructorArguements =" + constructorArguements);
 
         String[] str = contractname.split(":");
+        String byteCodeInWemix = null;
+        String byteCodeCompiled = null;
 
         try {
             File tempFile = createTempFile(sourceCode);
             ProcessBuilder processBuilder = new ProcessBuilder(compilerversion, "--standard-json", tempFile.getAbsolutePath());
-            System.out.println("Step 1");
             Process process = processBuilder.start();
-            System.out.println("Step 2");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            System.out.println("Step 3");
-            String line;
             Gson gson = new Gson();
+            String line = null;
 
             Web3j web3j = Web3j.build(new HttpService("https://api.wemix.com"));
+            try {
+                EthGetCode ethGetCode = web3j.ethGetCode(contractaddress, DefaultBlockParameterName.LATEST).send();
+                byteCodeInWemix = ethGetCode.getResult().substring(2, ethGetCode.getResult().length()-102);
+                System.out.println("deployedByteCode = " + byteCodeInWemix.substring(0, 64) + "...");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             while ((line = reader.readLine()) != null) {
-                // System.out.println(line);
-                SolidityStandardOutput object = gson.fromJson(line, SolidityStandardOutput.class);
+                System.out.println(line.substring(0, 64) + "...");
+                SolidityStandardOutput solidityStandardOutput = gson.fromJson(line, SolidityStandardOutput.class);
                 System.out.println("=============================================================================");
-                for (String key : object.getContracts().keySet()) {
+                for (String key : solidityStandardOutput.getContracts().keySet()) {
                     System.out.println("key:" + key);
                     if (key.equals(str[0])) {
-                        Map<String, List<LinkReference>> iRefs = object.getContracts().get(key).get(str[1]).getEvm().getDeployedBytecode().getImmutableReferences();
-                        for (LinkReference iRef : iRefs) {
-
+                        System.out.println(solidityStandardOutput.getContracts().toString());
+                        Bytecode deployedBytecode = solidityStandardOutput.getContracts().get(key).get(str[1]).getEvm().getDeployedBytecode();
+                        byteCodeCompiled = deployedBytecode.getObject();
+                        byteCodeCompiled = byteCodeCompiled.substring(0, byteCodeCompiled.length() - 102);
+                        Map<String, List<Reference>> immutableReferences = deployedBytecode.getImmutableReferences();
+                        for (String key2 : immutableReferences.keySet()) {
+                            for (int i = 0; i < immutableReferences.get(key2).size(); i++) {
+                                int start = Integer.parseInt(immutableReferences.get(key2).get(i).getStart());
+                                int length = Integer.parseInt(immutableReferences.get(key2).get(i).getLength());
+                                System.out.println("start = " + start + ", length = " + length);
+                                byteCodeInWemix = byteCodeInWemix.substring(0, start*2) + "0000000000000000000000000000000000000000000000000000000000000000" + byteCodeInWemix.substring(start*2+length*2);
+                            }
                         }
-                        String byteCode = object.getContracts().get(key).get(str[1]).getEvm().getBytecode().getObject() + constructorArguements;
-                        //System.out.println(object.getContracts().get(key).get(str[1]).getEvm().getBytecode().getObject());
-                        System.out.println("bytecode = " + byteCode);
-
-                        String compiled = null;
-                        Transaction tx = Transaction.createEthCallTransaction(null, null, byteCode);
-                        EthCall ethCall = web3j.ethCall(tx, DefaultBlockParameterName.LATEST).send();
-                        if (ethCall.getResult() != null) {
-                            compiled = ethCall.getResult().substring(0, ethCall.getResult().length() - 106);
-                            System.out.println("compiled = " + compiled);
-                        }
-                        EthGetCode ethGetCode = web3j.ethGetCode(contractaddress, DefaultBlockParameterName.LATEST).send();
-                        String registered = ethGetCode.getResult().substring(0, ethGetCode.getResult().length() - 106);
-                        System.out.println("registered = " + registered);
-                        if (compiled != null && compiled.equals(registered)) {
+                        System.out.println("=============================================================================");
+                        System.out.println(byteCodeCompiled);
+                        System.out.println("=============================================================================");
+                        System.out.println(byteCodeInWemix);
+                        System.out.println("=============================================================================");
+                        if (byteCodeCompiled != null && byteCodeCompiled.equals(byteCodeInWemix)) {
                             System.out.println(">>>>>>>>>>> The submitted smart contract and registered smart contract are equal !!!");
                         } else {
                             System.out.println(">>>>>>>>>>> The submitted smart contract and regsitered smart contract are NOT euqal !!!");
                         }
-                //         ContractNames contractName = object.getContractNames().get(key);
-                //         System.out.println(contractName.getContract().toString());
                     }
                 };
             }
